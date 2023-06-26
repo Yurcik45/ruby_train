@@ -5,12 +5,13 @@ def print_romb (width = 4, symbol = "$")
   if width < 3
     return puts "only >4"
   end
-  puts "all is ok"
+
+  if symbol == nil
+    symbol = "$"
+  end
 
   step = 0
   for a in 1...width
-    # puts "a: #{a}"
-    # puts "step: #{step}"
     line = Array.new
     for b in 0..width
       if b == width/2 + step || b == width/2 - step
@@ -29,4 +30,7 @@ def print_romb (width = 4, symbol = "$")
 
 end
 
-print_romb 50, "@"
+width = ARGV[0].to_i
+symbol = ARGV[1]
+
+print_romb width, symbol
