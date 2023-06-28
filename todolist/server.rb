@@ -18,20 +18,14 @@ end
 get '/items/:id' do
   id = params[:id].to_i
   task = todolist_db.get_task(id)[0].to_h
-  tasks.to_json
-  if item
-    status 200
-    body item.to_json
-  else
-    status 404
-    body 'Item not found'
-  end
+  status 200
+  body task.to_json
 end
 
 # Create a new item
 post '/items' do
   item = JSON.parse(request.body.read, symbolize_names: true)
-  added = todolist_db.add_task(item)[0].to_h
+  added = todolist_db.add_task(item[:task])[0].to_h
   status 201
   body added.to_json
 end
