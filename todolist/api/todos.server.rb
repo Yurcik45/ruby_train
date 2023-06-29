@@ -1,6 +1,10 @@
 todolist_db = Tasks.new
 params_check = ParamsCheck.new
 
+before do
+  check_auth_and_halt(request)
+end
+
 get '/test' do
   headers = request.env
   puts "authorization header: #{headers['HTTP_AUTHORIZATION']}"
@@ -8,8 +12,6 @@ end
 
 # Read all items
 get '/items' do
-  check_auth_and_halt(request)
-
   tasks = todolist_db.get_all_tasks.map { |row| row.to_h }
   tasks.to_json
 end
@@ -17,7 +19,6 @@ end
 
 # Read a specific item
 get '/items/:id' do
-  check_auth_and_halt(request)
   id = params[:id].to_i
   tasks_in_db = todolist_db.get_task(id)
   if tasks_in_db.ntuples > 0
@@ -31,7 +32,6 @@ end
 
 # Create a new item
 post '/items' do
-  check_auth_and_halt(request)
   item = JSON.parse(request.body.read, symbolize_names: true)
   if params_check.todo_post(item)
     added = todolist_db.add_task(item[:task])[0].to_h
@@ -44,7 +44,6 @@ end
 
 # Update an existing item
 put '/items/:id' do
-  check_auth_and_halt(request)
   id = params[:id].to_i
   updated_item = JSON.parse(request.body.read, symbolize_names: true)
   if params_check.todo_put(updated_item)
@@ -63,7 +62,6 @@ end
 
 # Delete an item
 delete '/items/:id' do
-  check_auth_and_halt(request)
   id = params[:id].to_i
   deleted_in_db = todolist_db.delete_task(id)
   if deleted_in_db
