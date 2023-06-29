@@ -15,6 +15,13 @@ class Users
       WHERE id=#{@user_id}")
   end
 
+  def get_user_by_email(email)
+    return @conn.ecex("
+     SELECT password
+     FROM #{@table}
+     WHERE email='#{email}'")
+  end
+
   def register_user(user)
     return @conn.exec("
       INSERT INTO #{@table}
@@ -24,20 +31,22 @@ class Users
         '#{user[:last_name]}',
         '#{user[:nickname]}',
         '#{user[:email]}',
-        '#{user[:password]}'
+        '#{hash_password(user[:password])}'
       )
       RETURNING *")
   end
 
   def login_user(user_data)
-    users = get_all_users
-    need_user = nil
-    users.each do |user|
-      if user['email'] === user_data[:email] && user['password'] === user_data[:password]
-        need_user = user
+    token = nil
+    user_in_db = get_user_by_email(user_data[:email])
+    if user_in_db.ntuples > 0
+      user_pass = user_data[:password]
+      db_pass = user_in_db[0]['password']
+      if compare_passwords(db_pass, user_pass)
+        token = generate_token(user_data)
       end
     end
-    return need_user
+    return token
   end
     
   def change_user(user)

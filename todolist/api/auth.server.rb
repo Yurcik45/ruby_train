@@ -39,11 +39,11 @@ post '/users/login' do
   body = JSON.parse(request.body.read, symbolize_names: true)
   if params_check.user_login(body)
     users_db = Users.new
-    need_user = users_db.login_user(body)
-    if need_user
-      user = need_user.to_h
+    result = users_db.login_user(body)
+    if result
+      token = result.to_h
       status 201
-      body user.to_json
+      body token.to_json
     else
       send_wrong_msg "incorrect email or login"
     end
