@@ -2,60 +2,49 @@ require 'dotenv/load'
 require 'pg'
 
 # Connection parameters
-$HOST = ENV['HOST']
-$PORT = ENV['PORT'].to_i
-$DBNAME = ENV['DBNAME']
-$USER = ENV['USER']
-$PASSWORD = ENV['PASSWORD']
+$db_config = {
+  host: ENV['HOST'],
+  port: ENV['PORT'].to_i,
+  dbname: ENV['DBNAME'],
+  user: ENV['USER'],
+  password: ENV['PASSWORD']
+}
 
-$table = "todolist"
+# Read the contents of the migration file
+$migration_file = File.read('./tables.sql')
 
-class Tasks
-  def initialize
-    @conn = Tasks.connect_to_db
-    # Register a custom type caster for the boolean column
-    @conn.type_map_for_results = PG::BasicTypeMapForResults.new(@conn).tap do |tm|
-      tm.add_coder(PG::TextDecoder::Boolean.new)
-    end
-    Tasks.check_table_exists @conn
+def db_connect
+  conn = PG::Connection.new($db_config)
+  conn.exec($migration_file)
+  conn.type_map_for_results = PG::BasicTypeMapForResults.new(conn).tap do |tm|
+    tm.add_coder(PG::TextDecoder::Boolean.new)
   end
+  return conn
+end
 
-  def self.connect_to_db
-    begin
-      return PG::Connection.new(host: $HOST, port: $PORT, dbname: $DBNAME, user: $USER, password: $PASSWORD)
-    rescue PG::ConnectionBad => e
-      puts "Error connecting to the PostgreSQL server: #{e.message}"
-      exit 1
-    end
+def initial_connect
+  begin
+    conn = PG::Connection.new($db_config)
+    conn.exec($migration_file)
+    puts 'Tables created successfully.'
+  rescue PG::Error => e
+    puts "Error creating tables: #{e.message}"
+  rescue PG::ConnectionBad => e
+    puts "Error connecting to the PostgreSQL server: #{e.message}"
+    exit 1
   end
-
-  def self.check_table_exists(conn)
-    begin
-      conn.exec("SELECT * FROM #{$table}")
-    rescue PG::UndefinedTable => e
-      puts "Error: Table does not exist. #{e.message}"
-      exit 1
-    end
+  begin
+    conn.exec("SELECT * FROM users")
+  rescue PG::UndefinedTable => e
+    puts "Error: Table 'users' does not exist. #{e.message}"
+    exit 1
   end
-
-  def get_all_tasks
-    return @conn.exec("SELECT * FROM #{$table}")
+  begin
+    conn.exec("SELECT * FROM todolist")
+  rescue PG::UndefinedTable => e
+    puts "Error: Table 'todolist' does not exist. #{e.message}"
+    exit 1
+  ensure
+    conn.close if conn
   end
-
-  def get_task(id)
-    return @conn.exec("SELECT * FROM #{$table} WHERE id=#{id}")
-  end
-
-  def add_task(task)
-    return @conn.exec("INSERT INTO #{$table} (task) VALUES ('#{task}') RETURNING *")
-  end
-    
-  def change_task(id, task, completed)
-    return @conn.exec("UPDATE #{$table} SET task='#{task}', completed=#{completed} WHERE id=#{id} RETURNING *")
-  end
-
-  def delete_task(id)
-    return @conn.exec("DELETE FROM #{$table} WHERE id=#{id} RETURNING *")
-  end
-  
 end
