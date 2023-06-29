@@ -2,9 +2,13 @@ params_check = ParamsCheck.new
 
 # Read all users
 get '/users' do
-  users_db = Users.new
-  users = users_db.get_all_users.map { |row| row.to_h }
-  users.to_json
+  if development?
+    users_db = Users.new
+    users = users_db.get_all_users.map { |row| row.to_h }
+    users.to_json
+  else
+    status 404
+  end
 end
 
 # Read a specific user

@@ -1,0 +1,7 @@
+task :dev do
+  sh 'RACK_ENV=development ruby index.rb'
+end
+
+task :prod do
+  sh 'RACK_ENV=production ruby index.rb'
+end
