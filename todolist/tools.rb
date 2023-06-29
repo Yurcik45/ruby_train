@@ -1,20 +1,27 @@
 class ParamsCheck
-  def check_post(body)
-    if !body
-      return false
-    elsif !body[:task]
-      return false
-    end
+  def todo_post(body)
+    return false if !body || !body[:task]
     return true
   end
-  def check_put(body)
-    if !body
-      return false
-    elsif !body[:task]
-      return false
-    elsif !body[:completed]
-      return false
-    end
+  def todo_put(body)
+    return false if !body || !body[:task] || !body[:completed]
     return true
   end
+  def user_info(body)
+    return false if !body || !body[:first_name] ||
+                    !body[:last_name] || !body[:nickname] ||
+                    !body[:email] || !body[:password]
+    return true
+  end
+  def user_login(body)
+    return false if !body || !body[:email] || !body[:password]
+    return true
+  end
+end
+
+def send_wrong_msg(message = "something went wrong")
+  status 400
+  msg = { message: message }
+  msg.to_h
+  body msg.to_json
 end

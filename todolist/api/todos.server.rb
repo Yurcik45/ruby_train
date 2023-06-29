@@ -1,20 +1,9 @@
-require 'sinatra'
-require 'json'
-require './db.rb'
-require './tools.rb'
-
-# Set the IP address and port
-# set :bind, '0.0.0.0'
-# set :port, 4567
-
 todolist_db = Tasks.new
 params_check = ParamsCheck.new
 
-def send_wrong_msg(message = "something went wrong")
-  status 400
-  msg = { message: message }
-  msg.to_h
-  body msg.to_json
+get '/test' do
+  headers = request.env
+  puts "authorization header: #{headers['HTTP_AUTHORIZATION']}"
 end
 
 # Read all items
@@ -39,7 +28,7 @@ end
 # Create a new item
 post '/items' do
   item = JSON.parse(request.body.read, symbolize_names: true)
-  if params_check.check_post(item)
+  if params_check.todo_post(item)
     added = todolist_db.add_task(item[:task])[0].to_h
     status 201
     body added.to_json
@@ -52,7 +41,7 @@ end
 put '/items/:id' do
   id = params[:id].to_i
   updated_item = JSON.parse(request.body.read, symbolize_names: true)
-  if params_check.check_put(updated_item)
+  if params_check.todo_put(updated_item)
     updated_in_db = todolist_db.change_task(id, updated_item[:task], updated_item[:completed])
     if updated_in_db.ntuples > 0
       updated = updated_in_db[0].to_h
