@@ -50,7 +50,7 @@ def check_auth_token(token)
 end
 
 def check_auth_and_halt(request)
-  halt 401, send_auth_error_msg if !check_auth(request.env['HTTP_AUTHORIZATION'])
+  halt 401, send_auth_error_msg if !check_auth_token(request.env['HTTP_AUTHORIZATION'])
 end
 
 $jwt_key = ENV['JWT_KEY']

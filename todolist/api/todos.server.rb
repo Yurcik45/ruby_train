@@ -2,7 +2,11 @@ todolist_db = Tasks.new
 params_check = ParamsCheck.new
 
 before do
-  check_auth_and_halt(request)
+  if request.path_info.start_with?('/items')
+    # Logic specific to certain routes
+    puts "before is working"
+    check_auth_and_halt(request)
+  end
 end
 
 get '/test' do

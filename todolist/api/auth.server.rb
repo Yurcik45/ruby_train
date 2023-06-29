@@ -30,9 +30,14 @@ post '/users/register' do
   body = JSON.parse(request.body.read, symbolize_names: true)
   if params_check.user_info(body)
     users_db = Users.new
-    added = users_db.register_user(body)
-    status 201
-    body added.to_json
+    added_in_db = users_db.register_user(body)
+    if added_in_db.ntuples > 0
+      added = added_in_db[0].to_h
+      status 201
+      body added.to_json
+    else
+      send_wrong_msg
+    end
   else
     send_wrong_msg
   end
@@ -43,9 +48,8 @@ post '/users/login' do
   body = JSON.parse(request.body.read, symbolize_names: true)
   if params_check.user_login(body)
     users_db = Users.new
-    result = users_db.login_user(body)
-    if result
-      token = result.to_h
+    token = users_db.login_user(body)
+    if token
       status 201
       body token.to_json
     else

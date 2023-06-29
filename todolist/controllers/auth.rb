@@ -16,7 +16,7 @@ class Users
   end
 
   def get_user_by_email(email)
-    return @conn.ecex("
+    return @conn.exec("
      SELECT *
      FROM #{@table}
      WHERE email='#{email}'")
@@ -33,7 +33,7 @@ class Users
         '#{user[:email]}',
         '#{hash_password(user[:password])}'
       )
-      RETURNING *")
+      RETURNING first_name,last_name,nickname,email")
   end
 
   def login_user(user_data)
