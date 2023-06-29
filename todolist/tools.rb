@@ -1,3 +1,6 @@
+require 'jwt'
+require 'bcrypt'
+
 class ParamsCheck
   def todo_post(body)
     return false if !body || !body[:task]
@@ -25,3 +28,23 @@ def send_wrong_msg(message = "something went wrong")
   msg.to_h
   body msg.to_json
 end
+
+$jwt_key = ENV['JWT_KEY']
+
+def generate_token(payload)
+  return JWT.encode(payload, $jwt_key, 'HS256')
+end
+
+def decode_token(token)
+  return JWT.decode(token, $jwt_key, true, algorithm: 'HS256')
+end
+
+def hash_password(password)
+  return BCrypt::Password.create(password)
+end
+
+def compare_passwords(hashed, normal)
+  return true if BCrypt::Password.new(hashed) == normal
+  return false
+end
+
