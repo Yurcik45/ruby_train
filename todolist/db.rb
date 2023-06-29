@@ -17,10 +17,25 @@ class Tasks
     @conn.type_map_for_results = PG::BasicTypeMapForResults.new(@conn).tap do |tm|
       tm.add_coder(PG::TextDecoder::Boolean.new)
     end
+    Tasks.check_table_exists @conn
   end
 
   def self.connect_to_db
-    return PG::Connection.new(host: $HOST, port: $PORT, dbname: $DBNAME, user: $USER, password: $PASSWORD)
+    begin
+      return PG::Connection.new(host: $HOST, port: $PORT, dbname: $DBNAME, user: $USER, password: $PASSWORD)
+    rescue PG::ConnectionBad => e
+      puts "Error connecting to the PostgreSQL server: #{e.message}"
+      exit 1
+    end
+  end
+
+  def self.check_table_exists(conn)
+    begin
+      conn.exec("SELECT * FROM #{$table}")
+    rescue PG::UndefinedTable => e
+      puts "Error: Table does not exist. #{e.message}"
+      exit 1
+    end
   end
 
   def get_all_tasks

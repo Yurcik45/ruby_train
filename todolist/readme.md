@@ -39,6 +39,13 @@ curl -X GET -H 'Content-Type: application/json' http://localhost:4567/items/2
 }
 </pre>
 
+### Response if item with selected id desn't exist
+<pre>
+{
+  "message": "no items was found with id 2"
+}
+</pre>
+
 ## Create a new Task
 
 ### Request
@@ -60,6 +67,13 @@ curl -X POST -H 'Content-Type: application/json' -d '{"task":"new curl task", "c
   "id": "2",
   "task": "new task",
   "completed": "f"
+}
+</pre>
+
+### Response if item with selected id desn't exist
+<pre>
+{
+  "message": "something went wrong"
 }
 </pre>
 
@@ -87,6 +101,12 @@ curl -X PUT -H 'Content-Type: application/json' -d '{"task":"updated text", "com
   "completed": "t"
 }
 </pre>
+### Response if item with selected id desn't exist
+<pre>
+{
+  "message": "something went wrong"
+}
+</pre>
 
 ## Delete task
 
@@ -102,5 +122,11 @@ curl -X DELETE -H 'Content-Type: application/json' http://localhost:4567/items/2
   "id": "2",
   "task": "updated text",
   "completed": "f"
+}
+</pre>
+### Response if item with selected id desn't exist
+<pre>
+{
+  "message": "something went wrong"
 }
 </pre>

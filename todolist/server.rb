@@ -1,12 +1,21 @@
 require 'sinatra'
 require 'json'
 require './db.rb'
+require './tools.rb'
 
 # Set the IP address and port
 # set :bind, '0.0.0.0'
 # set :port, 4567
 
 todolist_db = Tasks.new
+params_check = ParamsCheck.new
+
+def send_wrong_msg(message = "something went wrong")
+  status 400
+  msg = { message: message }
+  msg.to_h
+  body msg.to_json
+end
 
 # Read all items
 get '/items' do
@@ -17,32 +26,55 @@ end
 # Read a specific item
 get '/items/:id' do
   id = params[:id].to_i
-  task = todolist_db.get_task(id)[0].to_h
-  status 200
-  body task.to_json
+  tasks_in_db = todolist_db.get_task(id)
+  if tasks_in_db.ntuples > 0
+    task = tasks_in_db[0].to_h
+    status 200
+    body task.to_json
+  else
+    send_wrong_msg("no items was found with id #{id}")
+  end
 end
 
 # Create a new item
 post '/items' do
   item = JSON.parse(request.body.read, symbolize_names: true)
-  added = todolist_db.add_task(item[:task])[0].to_h
-  status 201
-  body added.to_json
+  if params_check.check_post(item)
+    added = todolist_db.add_task(item[:task])[0].to_h
+    status 201
+    body added.to_json
+  else
+    send_wrong_msg
+  end
 end
 
 # Update an existing item
 put '/items/:id' do
   id = params[:id].to_i
   updated_item = JSON.parse(request.body.read, symbolize_names: true)
-  updated = todolist_db.change_task(id, updated_item[:task], updated_item[:completed])[0].to_h
-  status 200
-  body updated.to_json
+  if params_check.check_put(updated_item)
+    updated_in_db = todolist_db.change_task(id, updated_item[:task], updated_item[:completed])
+    if updated_in_db.ntuples > 0
+      updated = updated_in_db[0].to_h
+      status 200
+      body updated.to_json
+    else
+      send_wrong_msg
+    end
+  else
+    send_wrong_msg
+  end
 end
 
 # Delete an item
 delete '/items/:id' do
   id = params[:id].to_i
-  deleted = todolist_db.delete_task(id)[0].to_h
-  status 200
-  body deleted.to_json
+  deleted_in_db = todolist_db.delete_task(id)
+  if deleted_in_db
+    deleted = deleted_in_db[0].to_h
+    status 200
+    body deleted.to_json
+  else
+    send_wrong_msg
+  end
 end
