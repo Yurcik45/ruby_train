@@ -17,7 +17,7 @@ class Users
 
   def get_user_by_email(email)
     return @conn.ecex("
-     SELECT password
+     SELECT *
      FROM #{@table}
      WHERE email='#{email}'")
   end
@@ -43,7 +43,11 @@ class Users
       user_pass = user_data[:password]
       db_pass = user_in_db[0]['password']
       if compare_passwords(db_pass, user_pass)
-        token = generate_token(user_data)
+        token = generate_token({
+          first_name: user_data[:first_name],
+          last_name: user_data[:last_name],
+          nickname: user_data[:nickname]
+        })
       end
     end
     return token
