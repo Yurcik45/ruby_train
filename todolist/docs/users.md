@@ -2,7 +2,7 @@
 | HTTP Verbs | Endpoints | Action |
 | --- | --- | --- |
 | POST | /users/register | To sign up a new user account |
-| POST | /users/register | To login an existing user account |
+| POST | /users/login | To login an existing user account |
 | GET | /users/info | To get information about the user |
 `will be developed...`
 | HTTP Verbs | Endpoints |
