@@ -1,7 +1,7 @@
 params_check = ParamsCheck.new
 
 before do
-  if request.path_info.start_with?('/items')
+  if request.path_info.start_with?('/items') || request.path_info.match?('/users/info')
     # Logic specific to certain routes
     puts "before is working"
     user_id = check_auth_and_halt(request)

@@ -14,6 +14,13 @@ class Users
       SELECT * FROM #{@table}
       WHERE id=#{@user_id}")
   end
+  
+  def get_user_info()
+    return @conn.exec("
+      SELECT id,first_name,last_name,email,nickname
+      FROM #{@table}
+      WHERE id=#{@user_id}")
+  end
 
   def get_user_by_email(email)
     return @conn.exec("

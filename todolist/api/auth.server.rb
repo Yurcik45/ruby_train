@@ -1,27 +1,16 @@
 params_check = ParamsCheck.new
 
-# Read all users
-get '/users' do
-  if development?
-    users_db = Users.new
-    users = users_db.get_all_users.map { |row| row.to_h }
-    users.to_json
-  else
-    status 404
-  end
-end
-
-# Read a specific user
-get '/users/:id' do
-  id = params[:id].to_i
-  users_db = Users.new(id)
-  user_in_db = users_db.get_user
+# Read user info
+get '/users/info' do
+  puts "/users/info"
+  users_db = Users.new(request.env['user_id'])
+  user_in_db = users_db.get_user_info
   if user_in_db.ntuples > 0
     user = user_in_db[0].to_h
     status 200
     body user.to_json
   else
-    send_wrong_msg("no users was found with id #{id}")
+    send_wrong_msg
   end
 end
 
@@ -77,5 +66,31 @@ put '/users/:id' do
     end
   else
     send_wrong_msg
+  end
+end
+
+# only for developing mode
+
+# Read all users
+get '/users' do
+  halt 404 if settings.environment != :development
+  users_db = Users.new
+  users = users_db.get_all_users.map { |row| row.to_h }
+  users.to_json
+end
+
+# Read a specific user
+get '/users/:id' do
+  puts "/users/:id"
+  halt 404 if settings.environment != :development
+  id = params[:id].to_i
+  users_db = Users.new(id)
+  user_in_db = users_db.get_user
+  if user_in_db.ntuples > 0
+    user = user_in_db[0].to_h
+    status 200
+    body user.to_json
+  else
+    send_wrong_msg "no users was found with id #{id}"
   end
 end
