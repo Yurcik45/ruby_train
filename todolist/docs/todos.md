@@ -44,12 +44,12 @@ curl -X GET -H 'Content-Type: application/json' -H 'Authorization: ___token___' 
   {
     "id": "2",
     "task":"newtask",
-    "completed": "f"
+    "completed": false
   },
   {
     "id": "3",
     "task": "new curl task",
-    "completed":"f"
+    "completed": false
   }
 ]
 </pre>
@@ -67,7 +67,7 @@ curl -X GET -H 'Content-Type: application/json' -H 'Authorization: ___token___' 
 {
   "id": "2",
   "task": "new task",
-  "completed": "f"
+  "completed": false
 }
 </pre>
 
@@ -84,7 +84,7 @@ curl -X GET -H 'Content-Type: application/json' -H 'Authorization: ___token___' 
 
 `POST /items/`
 
-curl -X POST -H 'Content-Type: application/json' -H 'Authorization: ___token___' -d '{"task":"new curl task", "completed":false}' http://localhost:4567/items
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: ___token___' -d '{"task":"new curl task"}' http://localhost:4567/items
 
 ## body
 <pre>
@@ -98,7 +98,7 @@ curl -X POST -H 'Content-Type: application/json' -H 'Authorization: ___token___'
 {
   "id": "2",
   "task": "new task",
-  "completed": "f"
+  "completed": false
 }
 </pre>
 
@@ -130,7 +130,7 @@ curl -X PUT -H 'Content-Type: application/json' -H 'Authorization: ___token___' 
 {
   "id": "2",
   "task": "updated text",
-  "completed": "t"
+  "completed": true
 }
 </pre>
 ### Response if item with selected id desn't exist
@@ -153,7 +153,7 @@ curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: ___token__
 {
   "id": "2",
   "task": "updated text",
-  "completed": "f"
+  "completed": false
 }
 </pre>
 ### Response if item with selected id desn't exist
