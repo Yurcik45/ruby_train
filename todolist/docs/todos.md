@@ -1,10 +1,42 @@
+### API Endpoints
+| HTTP Verbs | Endpoints | Action |
+| --- | --- | --- |
+| GET | /items | To get all todos items |
+| GET | /items/:id | To get a particular todos item |
+| POST | /items | To create a new todo |
+| PUT | /items/:id | To edit the details of a single todo |
+| DELETE | /items/:id | To delete a single todo |
+
+
+
+
+### Authorization header is required!
+
+`Authorization error response:`
+
+`status 401`
+<pre>
+{
+  "message": "Authorization error"
+}
+</pre>
+
+### All required headers
+<pre>
+{
+  "Authorization": "token",
+  "Content-Type": "application/json",
+}
+</pre>
+
+
 ## Get all tasks
 
 ### Request
 
 `GET /items/`
 
-curl -X GET -H 'Content-Type: application/json' http://localhost:4567/items
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: ___token___' http://localhost:4567/items
 
 ### Response
 <pre>
@@ -28,7 +60,7 @@ curl -X GET -H 'Content-Type: application/json' http://localhost:4567/items
 
 `GET /items/:2`
 
-curl -X GET -H 'Content-Type: application/json' http://localhost:4567/items/2
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: ___token___' http://localhost:4567/items/2
 
 ### Response
 <pre>
@@ -52,7 +84,7 @@ curl -X GET -H 'Content-Type: application/json' http://localhost:4567/items/2
 
 `POST /items/`
 
-curl -X POST -H 'Content-Type: application/json' -d '{"task":"new curl task", "completed":false}' http://localhost:4567/items
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: ___token___' -d '{"task":"new curl task", "completed":false}' http://localhost:4567/items
 
 ## body
 <pre>
@@ -83,7 +115,7 @@ curl -X POST -H 'Content-Type: application/json' -d '{"task":"new curl task", "c
 
 `PUT /items/:id`
 
-curl -X PUT -H 'Content-Type: application/json' -d '{"task":"updated text", "completed":true}' http://localhost:4567/items/2
+curl -X PUT -H 'Content-Type: application/json' -H 'Authorization: ___token___' -d '{"task":"updated text", "completed":true}' http://localhost:4567/items/2
 
 ## body
 <pre>
@@ -114,7 +146,7 @@ curl -X PUT -H 'Content-Type: application/json' -d '{"task":"updated text", "com
 
 `DELETE /items/:id`
 
-curl -X DELETE -H 'Content-Type: application/json' http://localhost:4567/items/2
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: ___token___' http://localhost:4567/items/2
 
 ### Response
 <pre>
