@@ -23,6 +23,8 @@ class Users
   end
 
   def register_user(user)
+    user_in_db = get_user_by_email(user[:email])
+    return nil if user_in_db.ntuples > 0
     return @conn.exec("
       INSERT INTO #{@table}
       (first_name,last_name,nickname,email,password)

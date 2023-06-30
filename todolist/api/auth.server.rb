@@ -31,6 +31,7 @@ post '/users/register' do
   if params_check.user_info(body)
     users_db = Users.new
     added_in_db = users_db.register_user(body)
+    halt send_wrong_msg "user with this email already exists" if !added_in_db
     if added_in_db.ntuples > 0
       added = added_in_db[0].to_h
       status 201
