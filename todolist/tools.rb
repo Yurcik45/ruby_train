@@ -40,11 +40,16 @@ def check_auth_token(token)
   return false if !token
   users_db = Users.new
   init_user_data = decode_token(token)
-  email = init_user_data[:email]
+  puts "init_user_data: #{init_user_data}"
+  email = init_user_data.first['email']
+  puts "email: #{email}"
   user_in_db = users_db.get_user_by_email(email)
   return false if user_in_db.ntuples === 0
   db_user_data = user_in_db[0]
-  test_token = generate_token(db_user_data)
+  puts "db_user_data: #{db_user_data}"
+  test_token = generate_token({ email: db_user_data['email'] })
+  puts "token: #{token}"
+  puts "test_token: #{test_token}"
   return true if token === test_token
   return false
 end

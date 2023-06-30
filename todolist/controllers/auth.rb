@@ -17,7 +17,14 @@ class Users
 
   def get_user_by_email(email)
     return @conn.exec("
-     SELECT *
+     SELECT first_name,last_name,email
+     FROM #{@table}
+     WHERE email='#{email}'")
+  end
+
+  def get_user_password_by_email(email)
+    return @conn.exec("
+     SELECT password
      FROM #{@table}
      WHERE email='#{email}'")
   end
@@ -40,15 +47,15 @@ class Users
 
   def login_user(user_data)
     token = nil
-    user_in_db = get_user_by_email(user_data[:email])
+    user_in_db = get_user_password_by_email(user_data[:email])
     if user_in_db.ntuples > 0
       user_pass = user_data[:password]
       db_pass = user_in_db[0]['password']
       if compare_passwords(db_pass, user_pass)
         token = generate_token({
-          first_name: user_data[:first_name],
-          last_name: user_data[:last_name],
-          nickname: user_data[:nickname]
+          # first_name: user_data[:first_name],
+          # last_name: user_data[:last_name],
+          email: user_data[:email],
         })
       end
     end
