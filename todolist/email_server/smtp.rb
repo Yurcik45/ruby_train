@@ -7,21 +7,26 @@ class MySMTPServer < SMTPServer::Server
 
   def receive_sender(sender)
     puts "Received sender: #{sender}"
+    @sender = sender
     true
   end
 
   def receive_recipient(recipient)
     puts "Received recipient: #{recipient}"
+    @recipient = recipient
     true
   end
 
   def receive_data_chunk(data)
     puts "Received data chunk: #{data}"
+    @data ||= ''
+    @data += data
     true
   end
 
   def receive_message
     puts 'Received entire message.'
+    send_email(@sender, @recipient, '', @data)
     true
   end
 

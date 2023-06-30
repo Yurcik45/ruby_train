@@ -9,10 +9,10 @@ def send_email(sender, recipient, subject, body)
     #{body}
   MESSAGE
 
-  smtp = Net::SMTP.new('your_smtp_server', 587)
+  smtp = Net::SMTP.new('localhost', 2525)  # Update with the SMTP server address and port
   smtp.enable_starttls
 
-  smtp.start('your_domain', 'your_username', 'your_password', :login) do |smtp|
+  smtp.start do |smtp|
     smtp.send_message(message, sender, recipient)
   end
 end
