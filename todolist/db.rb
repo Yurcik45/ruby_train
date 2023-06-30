@@ -15,7 +15,6 @@ $migration_file = File.read('./tables.sql')
 
 def db_connect
   conn = PG::Connection.new($db_config)
-  conn.exec($migration_file)
   conn.type_map_for_results = PG::BasicTypeMapForResults.new(conn).tap do |tm|
     tm.add_coder(PG::TextDecoder::Boolean.new)
   end
