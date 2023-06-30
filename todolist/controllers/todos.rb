@@ -7,13 +7,13 @@ class Tasks
 
   def get_all_tasks
     return @conn.exec("
-      SELECT * FROM #{@table}
+      SELECT id,task,completed FROM #{@table}
       WHERE user_id=#{@user_id}")
   end
 
   def get_task(id)
     return @conn.exec("
-      SELECT * FROM #{@table}
+      SELECT id,task,completed FROM #{@table}
       WHERE id=#{id} AND user_id=#{@user_id}")
   end
 
@@ -21,7 +21,7 @@ class Tasks
     return @conn.exec("
       INSERT INTO #{@table} (task,user_id)
       VALUES ('#{task}', #{@user_id})
-      RETURNING *")
+      RETURNING id,task,completed")
   end
     
   def change_task(id, task, completed)
@@ -29,7 +29,7 @@ class Tasks
       UPDATE #{@table}
       SET task='#{task}', completed=#{completed}
       WHERE id=#{id} AND user_id=#{@user_id}
-      RETURNING *")
+      RETURNING id,task,completed")
   end
 
   def delete_task(id)
