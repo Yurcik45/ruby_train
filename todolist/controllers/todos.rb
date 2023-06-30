@@ -1,5 +1,5 @@
 class Tasks
-  def initializer(user_id)
+  def initialize(user_id)
     @user_id = user_id
     @conn = db_connect
     @table = "todolist"

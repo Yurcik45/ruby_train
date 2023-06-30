@@ -17,7 +17,7 @@ class Users
 
   def get_user_by_email(email)
     return @conn.exec("
-     SELECT first_name,last_name,email
+     SELECT id,first_name,last_name,email
      FROM #{@table}
      WHERE email='#{email}'")
   end
