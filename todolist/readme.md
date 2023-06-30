@@ -7,4 +7,6 @@
 #### Start in production mode
 `rake prod`
 
+`default port:` `4567`
+
 > see API documentation in __docs__ folder
