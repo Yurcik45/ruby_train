@@ -33,6 +33,30 @@ post '/users/register' do
   end
 end
 
+get '/users/activate' do
+  users_db = Users.new(request.env['user_id'])
+  halt 300 if users_db.check_user_activate
+  confirms_in_db = users_db.set_confirmation_info
+  halt send_wrong_msg if confirms_in_db.ntuples === 0
+  status 201
+  msg = { message: "Activated code on your email (haahahhah, NO, in console)" }.to_h
+  body msg.to_json
+end
+
+post '/users/activate' do
+  body = JSON.parse(request.body.read, symbolize_names: true)
+  halt 400 if !params_check.user_activate(body)
+  users_db = Users.new(request.env['user_id'])
+  halt 300 if users_db.check_user_activate
+  user_code = body[:activation_code]
+  puts "POST user_code: #{user_code}"
+  confirms_in_db = users_db.activate_user user_code
+  halt send_wrong_msg if !confirms_in_db
+  status 201
+  msg = { message: "Activation Successfull" }.to_h
+  body msg.to_json
+end
+
 # Login a new user
 post '/users/login' do
   body = JSON.parse(request.body.read, symbolize_names: true)

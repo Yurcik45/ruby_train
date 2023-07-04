@@ -82,6 +82,56 @@ class Users
       RETURNING *")
   end
 
+
+  def check_user_activate
+    confirm_in_db = @conn.exec("
+      SELECT is_confirmed
+      FROM confirmations
+      WHERE user_id=#{@user_id}")
+    return false if confirm_in_db.ntuples === 0 || confirm_in_db[0]['is_confirmed'] === false
+    return true
+  end
+
+
+  def get_confirmation_info
+    user_in_db = @conn.exec("
+      SELECT *
+      FROM confirmations
+      WHERE user_id=#{@user_id}")
+    return nil if user_in_db.ntuples === 0
+    return user_in_db[0]
+  end
+
+  def set_confirmation_info
+    code = rand(10_000).to_s.rjust(4, '0')
+    puts "======================"
+    puts "activation code: #{code}"
+    puts "======================"
+    return @conn.exec("
+      INSERT INTO confirmations
+      (user_id,confirmation_code)
+      VALUES (#{@user_id},#{code})
+      RETURNING *")
+  end
+
+  def check_activation_code(code)
+    user_in_db = get_confirmation_info
+    return false if !user_in_db
+    db_confirmation_code = user_in_db['confirmation_code']
+    return db_confirmation_code.to_i === code
+  end
+
+  def activate_user(code)
+    return nil if !check_activation_code code
+    return @conn.exec("
+      UPDATE confirmations
+      SET
+        is_confirmed=#{true},
+        confirmation_code=#{0}
+      WHERE user_id='#{@user_id}'
+      RETURNING *")
+  end
+
   # future
   # def activate_user
 end

@@ -11,8 +11,16 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS todolist (
   id SERIAL PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users(id),
-  task VARCHAR(255) NOT NULL,
-  completed BOOLEAN DEFAULT false
+  task VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS confirmations (
+  confirmation_id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  confirmation_code VARCHAR(50) NOT NULL,
+  sent_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_confirmed BOOLEAN DEFAULT false,
+  FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 -- -- prew
