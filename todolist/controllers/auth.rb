@@ -14,7 +14,7 @@ class Users
       SELECT * FROM #{@table}
       WHERE id=#{@user_id}")
   end
-  
+
   def get_user_info()
     return @conn.exec("
       SELECT id,first_name,last_name,email,nickname
@@ -76,10 +76,18 @@ class Users
         first_name='#{user[:first_name]}',
         last_name='#{user[:last_name]}',
         nickname='#{user[:nickname]}',
-        email='#{user[:email]}',
-        password='#{user[:password]}'
+        email='#{user[:email]}'
       WHERE id=#{@user_id}
       RETURNING *")
+  end
+
+  def update_password(password)
+    result = @conn.exec("
+      UPDATE #{@table}
+      SET password='#{hash_password(password)}
+      WHERE id=#{@user_id}")
+    return true if result.result_status == PG::Constants::PGRES_COMMAND_OK
+    return false
   end
 
 
@@ -130,6 +138,12 @@ class Users
         confirmation_code=#{0}
       WHERE user_id='#{@user_id}'
       RETURNING *")
+  end
+
+  def restore_password(emai, password)
+    user_in_db = get_user_by_email email
+    return nil if user_in_db.ntuples === 0
+    return update_password password
   end
 
   # future

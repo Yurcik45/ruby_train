@@ -93,6 +93,17 @@ put '/users/:id' do
   end
 end
 
+# Restore user password
+post '/users/restore_password'
+  body = JSON.parse(request.body.read, symbolize_names: true)
+  if params.check(body)
+    users_db = Users.new()
+    if users_db.restore_password body[:email] body[:password]
+  else
+    send_wrong_msg
+  end
+end
+
 # only for developing mode
 
 # Read all users

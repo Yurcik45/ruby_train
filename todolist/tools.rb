@@ -24,6 +24,10 @@ class ParamsCheck
     return false if !body || !body[:activation_code]
     return true
   end
+  def password_restore(body)
+    return false if !body || !body[:email] || !body[:password]
+    return true
+  end
 end
 
 def send_wrong_msg(message = "something went wrong")
