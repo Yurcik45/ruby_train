@@ -94,11 +94,17 @@ put '/users/:id' do
 end
 
 # Restore user password
-post '/users/restore_password'
+post '/users/restore_password' do
   body = JSON.parse(request.body.read, symbolize_names: true)
   if params.check(body)
-    users_db = Users.new()
-    if users_db.restore_password body[:email] body[:password]
+    users_db = Users.new
+    if users_db.restore_password(body[:email],body[:password])
+      status 201
+      msg = { message: "Password Updated" }.to_h
+      body msg.to_json
+    else
+      send_wrong_msg
+    end
   else
     send_wrong_msg
   end
