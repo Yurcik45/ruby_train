@@ -25,7 +25,11 @@ class ParamsCheck
     return true
   end
   def password_restore(body)
-    return false if !body || !body[:email] || !body[:password]
+    return false if !body || !body[:email] || !body[:password] || body[:code]
+    return true
+  end
+  def restore_password_code(body)
+    return false if !body || !body[:email]
     return true
   end
 end

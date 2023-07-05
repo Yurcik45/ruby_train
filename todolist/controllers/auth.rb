@@ -81,16 +81,6 @@ class Users
       RETURNING *")
   end
 
-  def update_password(password)
-    result = @conn.exec("
-      UPDATE #{@table}
-      SET password='#{hash_password(password)}
-      WHERE id=#{@user_id}")
-    return true if result.result_status == PG::Constants::PGRES_COMMAND_OK
-    return false
-  end
-
-
   def check_user_activate
     confirm_in_db = @conn.exec("
       SELECT is_confirmed
@@ -99,7 +89,6 @@ class Users
     return false if confirm_in_db.ntuples === 0 || confirm_in_db[0]['is_confirmed'] === false
     return true
   end
-
 
   def get_confirmation_info
     user_in_db = @conn.exec("
@@ -122,9 +111,31 @@ class Users
       RETURNING *")
   end
 
+  def reset_confirmation_info(user_id)
+    code = rand(10_000).to_s.rjust(4, '0')
+    puts "======================"
+    puts "activation code: #{code}"
+    puts "======================"
+    return @conn.exec("
+      UPDATE confirmations
+      SET
+       confirmation_code=#{code},
+       is_confirmed=#{false}
+      WHERE user_id='#{user_id}'")
+  end
+
   def check_activation_code(code)
     user_in_db = get_confirmation_info
     return false if !user_in_db
+    db_confirmation_code = user_in_db['confirmation_code']
+    return db_confirmation_code.to_i === code
+  end
+
+  def check_password_activation_code(code, user_id)
+    user_in_db = @conn.exec("
+      SELECT *
+      FROM confirmations
+      WHERE user_id=#{user_id}")
     db_confirmation_code = user_in_db['confirmation_code']
     return db_confirmation_code.to_i === code
   end
@@ -140,12 +151,31 @@ class Users
       RETURNING *")
   end
 
-  def restore_password(emai, password)
+  def restore_password(email, password, code)
     user_in_db = get_user_by_email email
-    return nil if user_in_db.ntuples === 0
-    return update_password password
+    return false if user_in_db.ntuples === 0
+    user_id = user_in_db[0]['id']
+    return false if check_password_activation_code(code,user_id)
+    upd_result = @conn.exec("
+      UPDATE confirmations
+      SET
+        is_confirmed=#{true},
+        confirmation_code=#{0}
+      WHERE user_id='#{@user_id}'
+      RETURNING *")
+    upd_status = upd_result.result_status == PG::Constants::PGRES_COMMAND_OK
+    return false if !upd_result
+    return true
   end
 
-  # future
-  # def activate_user
+  def restore_password_request(email)
+    user_in_db = get_user_by_email email
+    return false if user_in_db.ntuples == 0
+    user_id = user_in_db[0]['id']
+    puts "user id: #{user_id}"
+    res_result = reset_confirmation_info user_id
+    res_status = res_result.result_status == PG::Constants::PGRES_COMMAND_OK
+    return false if !res_status
+    return true
+  end
 end

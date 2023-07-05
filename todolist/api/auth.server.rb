@@ -93,12 +93,32 @@ put '/users/:id' do
   end
 end
 
+post '/users/restore_password_code' do
+  request_body = request.body.read
+  halt send_wrong_msg if request_body.nil? || request_body.empty?
+  body = JSON.parse(request_body, symbolize_names: true)
+  if params_check.restore_password_code(body)
+    users_db = Users.new
+    if users_db.restore_password_request body[:email]
+      status 201
+      msg = { message: "check code on your email (LOL, NO, console)" }.to_h
+      body msg.to_json
+    else
+      send_wrong_msg
+    end
+  else
+    send_wrong_msg
+  end
+end
+
 # Restore user password
 post '/users/restore_password' do
   body = JSON.parse(request.body.read, symbolize_names: true)
-  if params.check(body)
+  if params_check.password_restore(body)
+    puts "email: #{body[:email]}"
+    puts "password: #{body[:password]}"
     users_db = Users.new
-    if users_db.restore_password(body[:email],body[:password])
+    if users_db.restore_password(body[:email],body[:password],body[:code])
       status 201
       msg = { message: "Password Updated" }.to_h
       body msg.to_json
