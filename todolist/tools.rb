@@ -7,7 +7,7 @@ class ParamsCheck
     return true
   end
   def todo_put(body)
-    return false if !body || !body[:task] || !body[:completed]
+    return false if !body || !body[:task] || body[:completed] == nil
     return true
   end
   def user_info(body)
